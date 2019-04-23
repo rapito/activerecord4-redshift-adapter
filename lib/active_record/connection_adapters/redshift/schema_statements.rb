@@ -7,14 +7,22 @@ module ActiveRecord
         def visit_ColumnDefinition(o)
           sql = super
           if o.primary_key? && o.type != :primary_key
-            sql << " PRIMARY KEY "
+            sql << " IDENTITY(1,1) "
             add_column_options!(sql, column_options(o))
           end
           sql
         end
 
+        def column_options(o)
+          column_options = super
+          column_options
+        end
+
         def add_column_options!(sql, options)
           column = options.fetch(:column) { return super }
+          if options[:identity] && options[:identity].first && options[:identity].last
+            sql << " IDENITY #{options[:identity].first options[:identity].last}"
+          end
           if column.type == :uuid && options[:default] =~ /\(\)/
             sql << " DEFAULT #{options[:default]}"
           else
